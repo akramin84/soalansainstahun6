@@ -1,0 +1,47 @@
+function onFormSubmit(e) {
+  // MAKLUMAT TELEGRAM BOT ANDA
+  var token = "8825456874:AAGb3Owl7HNJ1m0rP5fkMJnsQDKFkn8rj3I";
+  var chatId = "6087514961";
+  
+  try {
+    var response = e.response;
+    var itemResponses = response.getItemResponses();
+    
+    // Mengambil data murid berdasarkan susunan soalan pertama & kedua
+    var namaMurid = itemResponses[0].getResponse();
+    var kelasMurid = itemResponses[1].getResponse(); 
+    
+    // Mengambil markah kuiz
+    var score = response.getGradingResult().getPointsScore();
+    var maxScore = response.getGradingResult().getPointsToAssign();
+    
+    // Format peratusan
+    var peratus = ((score / maxScore) * 100).toFixed(0);
+    
+    // Mesej kemas yang akan dihantar ke Telegram
+    var message = "📝 *KEPUTUSAN KUIZ SAINS TAHUN 6*\n" +
+                  "--------------------------------------\n" +
+                  "👤 *Nama Murid :* " + namaMurid + "\n" +
+                  "🏫 *Kelas :* " + kelasMurid + "\n" +
+                  "💯 *Markah :* " + score + " / " + maxScore + " (" + peratus + "%)\n" +
+                  "📅 *Tarikh/Masa :* " + new Date().toLocaleString("ms-MY", { timeZone: "Asia/Kuala_Lumpur" }) + "\n" +
+                  "--------------------------------------";
+    
+    // Hantar ke Telegram API
+    var url = "https://api.telegram.org/bot" + token + "/sendMessage";
+    var payload = {
+      "method": "post",
+      "contentType": "application/json",
+      "payload": JSON.stringify({
+        "chat_id": chatId,
+        "text": message,
+        "parse_mode": "Markdown"
+      })
+    };
+    
+    UrlFetchApp.fetch(url, payload);
+    
+  } catch(error) {
+    Logger.log("Ralat: " + error.toString());
+  }
+}
